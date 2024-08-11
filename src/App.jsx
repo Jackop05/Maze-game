@@ -14,6 +14,9 @@ function App() {
   const [startClicked, setStartClicked] = useState(false);
   const [endClicked, setEndClicked] = useState(false);
 
+  const delay = (ms) => {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
 
   const sizeChange = (e) => {
     setMazeSize(e.target.value); 
@@ -59,7 +62,7 @@ function App() {
         setStart(false);
       }
       setEnd([rowIndex, index]);
-
+      
     } else {
       array[rowIndex][index] = (maze[rowIndex][index] !== 11) ? 11 : 10;
     }
@@ -73,6 +76,8 @@ function App() {
     if(endClicked === true){
       setEndClicked(false);
     }
+
+    setClicked(clicked+1);
   }
 
   const endClick = () => {
@@ -80,12 +85,84 @@ function App() {
     if(startClicked === true){
       setStartClicked(false);
     }
+
+    setClicked(clicked+1);
   }
+
+  const bfs = async () => {
+    if (!start || !end) {
+      return;
+    }
+  
+    const directions = [
+      [0, 1],  // right
+      [1, 0],  // down
+      [0, -1], // left
+      [-1, 0], // up
+    ];
+  
+    let queue = [[...start]];
+    let visited = new Set();
+    let parentMap = new Map();
+    let tempMap = maze;
+  
+    visited.add(`${start[0]}-${start[1]}`);
+  
+    while (queue.length > 0) {
+      
+      let [x, y] = queue.shift();
+  
+      // If the end is reached, backtrack to find the path
+      if (x === end[0] && y === end[1]) {
+        let path = [];
+        let current = `${end[0]}-${end[1]}`;
+        
+        while (current) {
+          path.push(current);
+          current = parentMap.get(current);
+        }
+        
+        path.reverse().forEach((tile, idx) => {
+          let [row, col] = tile.split('-').map(Number);
+          if (idx !== 0 && idx !== path.length - 1) {
+            tempMap[row][col] = 3; // Mark the shortest path
+          }
+        });
+        tempMap[end[0]][end[1]] = 13;
+        
+  
+        setMaze([...tempMap]);
+        setSolved(true);
+        return;
+      }
+  
+      // Explore neighbors
+      directions.forEach(([dx, dy]) => {
+        let newX = x + dx;
+        let newY = y + dy;
+        let newKey = `${newX}-${newY}`;
+  
+        if (
+          newX >= 0 && newY >= 0 &&
+          newX < mazeSize && newY < mazeSize &&
+          !visited.has(newKey) && tempMap[newX][newY] !== 11 // not a wall
+        ) {
+          queue.push([newX, newY]);
+          visited.add(newKey);
+          tempMap[newX][newY] = 1; // Mark as visited
+          parentMap.set(newKey, `${x}-${y}`);
+        }
+      });
+      
+      setMaze([...tempMap]);
+      setClicked(clicked+1); 
+    }
+  };
 
 
 
   const render = () => {
-    const tileSize = 600/mazeSize;
+    const tileSize = 500/mazeSize;
 
     let tiles = [];
     maze.map((tileArray, index) => {
@@ -106,10 +183,10 @@ function App() {
             display = `bg-slate-800`;
             break;
           case 12:
-            display = `bg-green-400`;
+            display = `bg-green-500`;
             break;
           case 13:
-            display = `bg-red-400`;
+            display = `bg-red-500`;
             break;
           case 1:
             display = `bg-purple-300`;
@@ -118,7 +195,7 @@ function App() {
             display = `bg-green-300`;
             break;
           case 3:
-            display = `bg-green-500`;
+            display = `bg-green-200`;
             break;
           default:
             display = ``;
@@ -131,9 +208,9 @@ function App() {
     })
     console.log(tiles);
 
-
+    console.log(mazeSize)
     return (
-      <div className={`grid grid-cols-${mazeSize} grid-rows-${mazeSize} bg-slate-700 max-w-[600px] max-h-[600px] mx-auto`}>
+      <div className="grid bg-slate-700 w-[600px] h-[600px] mx-auto" style={{gridTemplateColumns: `repeat(${mazeSize}, minmax(0, 1fr))`, gridTemplateRows: `repeat(${mazeSize}, minmax(0, 1fr))`, }}>
         {tiles}
       </div>
     )
@@ -141,14 +218,15 @@ function App() {
 
 
   useEffect(() => {
-    console.log('Refreshed...');
+    console.log('Refreshed...')
+    console.log('maze: ', maze)
     setRenderMaze(render());
-  }, [clicked, start, end])
+  }, [clicked])
 
 
 
   return (
-    <div className="w-screen h-screen bg-slate-50 flex flex-col justify-center">
+    <div className="w-screen bg-slate-50 flex flex-col justify-center p-20">
       <div className='flex justify-between w-[700px] mx-auto gap-4'>
         <form id="numberForm"  className="px-8 py-6 bg-green-300 max-w-[400px] rounded-3xl mx-auto" onSubmit={(e) => e.preventDefault()} >
           <div className="flex gap-4 items-center pb-4">
@@ -171,7 +249,7 @@ function App() {
     </div>
 
       {renderMaze}
-      <div className='rounded-full bg-[#6bdfff] px-6 py-2 mx-auto font-semibold cursor-pointer mt-10'>Solve maze</div>
+      <div className='rounded-full bg-[#6bdfff] px-6 py-2 mx-auto font-semibold cursor-pointer mt-10' onClick={bfs}>Solve maze</div>
 
     </div>
   );
