@@ -27,6 +27,15 @@ function App() {
       }
     }
 
+    document.getElementById("solve-button").scrollIntoView({
+      behavior: "smooth", 
+      block: "start",    
+      inline: "nearest"   
+    });
+
+    setSolved(false);
+    setStart(false);
+    setEnd(false);
     setMaze(array);
     setClicked(clicked + 1);
   };
@@ -161,7 +170,7 @@ function App() {
       setClicked((clicked) => clicked + 1);
 
       // Introduce a delay of 0.1 seconds
-      await new Promise((resolve) => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 2000/(mazeSize*mazeSize*mazeSize)));
     }
 
     tempMap[end[0]][end[1]] = 13;
@@ -169,6 +178,24 @@ function App() {
     setMaze([...tempMap]);
     setClicked(clicked + 1);
   };
+
+  const restart = () => {
+    let array = [];
+    for (let i = 0; i < mazeSize; i++) {
+      array[i] = [];
+      for (let j = 0; j < mazeSize; j++) {
+        array[i][j] = 10;
+      }
+    }
+
+    setSolved(false);
+    setStart(false);
+    setEnd(false);
+    setMaze(array);
+    setClicked(clicked + 1);
+  }
+
+
 
   const render = () => {
     const tileSize = 400 / mazeSize;
@@ -239,8 +266,12 @@ function App() {
   }, [clicked, isMouseDown, maze]); // Re-render on click or mouse hold
 
   return (
-    <div className="w-screen bg-slate-50 flex flex-col justify-center p-20">
+    <div className="w-screen min-h-screen bg-slate-50 flex flex-col justify-center p-20">
       <div className="flex justify-between w-[700px] mx-auto gap-4">
+        <div className="text-lg font-semibold bg-green-300 max-w-[300px] max-h-[145px] rounded-3xl px-8 py-4 text-center flex flex-col justify-center mx-auto">
+          Welcome to maze game, click tiles or drag mouse and see what the shortest path is!
+        </div>
+
         <form
           id="numberForm"
           className="px-8 py-6 bg-green-300 max-w-[400px] rounded-3xl mx-auto"
@@ -261,34 +292,24 @@ function App() {
             />
           </div>
           <div className="flex justify-center">
-            <button
-              type="submit"
-              className="rounded-full bg-[#6bdfff] px-6 py-2 mx-auto font-semibold cursor-pointer"
-              onClick={handleSubmit}
-            >
-              Submit
-            </button>
+            <button type="submit" className="rounded-full bg-[#6bdfff] px-6 py-2 mx-auto font-semibold cursor-pointer transition-all hover:shadow-xl hover:scale-[1.025]" onClick={handleSubmit}>Start</button>
           </div>
         </form>
-
-        <div className="text-lg font-semibold bg-green-300 max-w-[300px] max-h-[145px] rounded-3xl px-8 py-4 text-center flex flex-col justify-center">
-          Welcome to maze game, click tiles and see what the shortest path is!
-        </div>
       </div>
 
-      <div className="flex justify-center gap-10 mb-10">
+      <div className="flex justify-center gap-10 mb-6">
         <div
           className={`${
-            startClicked ? 'bg-[#6b93ff]' : 'bg-[#6bdfff]'
-          } rounded-full px-6 py-2 font-semibold cursor-pointer mt-6 transition-all duration-500`}
+            startClicked ? 'bg-[#4e7dff]' : 'bg-[#6bdfff]'
+          } rounded-full px-6 py-2 font-semibold cursor-pointer mt-10 transition-all duration-300 hover:shadow-xl hover:scale-[1.025]`}
           onClick={startClick}
         >
           Set start
         </div>
         <div
           className={`${
-            endClicked ? 'bg-[#6b93ff]' : 'bg-[#6bdfff]'
-          } rounded-full px-6 py-2 font-semibold cursor-pointer mt-6 transition-all duration-500`}
+            endClicked ? 'bg-[#4e7dff]' : 'bg-[#6bdfff]'
+          } rounded-full px-6 py-2 font-semibold cursor-pointer mt-10 transition-all duration-300 hover:shadow-xl hover:scale-[1.025]`}
           onClick={endClick}
         >
           Set end
@@ -296,12 +317,12 @@ function App() {
       </div>
 
       {renderMaze}
-      <div
-        className="rounded-full bg-[#6bdfff] px-6 py-2 mx-auto font-semibold cursor-pointer mt-10"
-        onClick={bfs}
-      >
-        Solve maze
-      </div>
+      {!solved &&
+        <div id="solve-button" className="rounded-full bg-[#6bdfff] px-6 py-2 mx-auto font-semibold cursor-pointer mt-10 hover:shadow-xl transition-all hover:scale-[1.025]" onClick={bfs}>Solve maze</div>
+      }
+      {solved &&
+        <div id="solve-button" className="rounded-full bg-[#6bdfff] px-6 py-2 mx-auto font-semibold cursor-pointer mt-10 hover:shadow-xl transition-all hover:scale-[1.025]" onClick={restart}>Restart</div>
+      }
     </div>
   );
 }
