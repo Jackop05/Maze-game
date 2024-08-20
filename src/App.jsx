@@ -198,7 +198,8 @@ function App() {
 
 
   const render = () => {
-    const tileSize = 400 / mazeSize;
+    let size = window.innerWidth > 768 ? 400 : 300;
+    const tileSize = size / mazeSize;
 
     let tiles = [];
     maze.map((tileArray, index) => {
@@ -250,7 +251,7 @@ function App() {
 
     return (
       <div
-        className="grid bg-slate-700 w-[400px] h-[400px] mx-auto"
+        className={`grid bg-slate-700 w-[${size}px] h-[${size}px] mx-auto`}
         style={{
           gridTemplateColumns: `repeat(${mazeSize}, minmax(0, 1fr))`,
           gridTemplateRows: `repeat(${mazeSize}, minmax(0, 1fr))`,
@@ -266,9 +267,9 @@ function App() {
   }, [clicked, isMouseDown, maze]); // Re-render on click or mouse hold
 
   return (
-    <div className="w-screen min-h-screen bg-slate-50 flex flex-col justify-center p-20">
-      <div className="flex justify-between w-[700px] mx-auto gap-4">
-        <div className="text-lg font-semibold bg-green-300 max-w-[300px] max-h-[145px] rounded-3xl px-8 py-4 text-center flex flex-col justify-center mx-auto">
+    <div className="w-screen min-h-screen bg-slate-50 flex flex-col justify-center p-6 md:p-20">
+      <div className="md:flex justify-between md:w-[700px] mx-auto gap-4">
+        <div className="text-lg font-semibold bg-green-300 max-w-[300px] max-h-[145px] rounded-3xl px-8 py-4 mb-6 md:mb-0 text-center flex flex-col justify-center mx-auto">
           Welcome to maze game, click tiles or drag mouse and see what the shortest path is!
         </div>
 
@@ -278,7 +279,7 @@ function App() {
           onSubmit={(e) => e.preventDefault()}
         >
           <div className="flex gap-4 items-center pb-4">
-            <label className="text-xl font-semibold">Size of the maze:</label>
+            <label className="text-md md:text-xl font-semibold">Size of the maze:</label>
             <input
               type="number"
               id="numberInput"
@@ -288,7 +289,7 @@ function App() {
               required
               min="5"
               max="50"
-              className="rounded-full outline-none px-6 py-2"
+              className="rounded-full outline-none px-6 py-2 text-center"
             />
           </div>
           <div className="flex justify-center">
