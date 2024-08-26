@@ -199,16 +199,11 @@ function App() {
 
   const render = () => {
     let size = window.innerWidth > 768 ? 400 : 300;
-    const tileSize = size / mazeSize;
-
+    const tileSize = Math.floor(size / mazeSize);
+  
     let tiles = [];
-    maze.map((tileArray, index) => {
-      const rowIndex = index;
-      if (tileArray.length === 0) {
-        return <></>;
-      }
-
-      tileArray.map((tile, index) => {
+    maze.forEach((tileArray, rowIndex) => {
+      tileArray.forEach((tile, index) => {
         let display;
         switch (tile) {
           case 10:
@@ -236,10 +231,15 @@ function App() {
             display = ``;
             break;
         }
-
+  
         tiles.push(
           <div
-            className={`${display} w-[${tileSize}px] h-[${tileSize}px] border-[1px] border-slate-500 cursor-pointer hover:bg-slate-600`}
+            key={`${rowIndex}-${index}`}
+            className={`${display} border-[1px] border-slate-500 cursor-pointer hover:bg-slate-600`}
+            style={{
+              width: `${tileSize}px`,
+              height: `${tileSize}px`,
+            }}
             onClick={() => clickedTile(rowIndex, index)}
             onMouseDown={handleMouseDown}
             onMouseUp={handleMouseUp}
@@ -248,19 +248,22 @@ function App() {
         );
       });
     });
-
+  
     return (
       <div
-        className={`grid bg-slate-700 w-[${size}px] h-[${size}px] mx-auto`}
+        className="grid bg-slate-700 mx-auto"
         style={{
-          gridTemplateColumns: `repeat(${mazeSize}, minmax(0, 1fr))`,
-          gridTemplateRows: `repeat(${mazeSize}, minmax(0, 1fr))`,
+          width: `${tileSize * mazeSize}px`,
+          height: `${tileSize * mazeSize}px`,
+          gridTemplateColumns: `repeat(${mazeSize}, ${tileSize}px)`,
+          gridTemplateRows: `repeat(${mazeSize}, ${tileSize}px)`,
         }}
       >
         {tiles}
       </div>
     );
   };
+  
 
   useEffect(() => {
     setRenderMaze(render());
