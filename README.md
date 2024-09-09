@@ -3,6 +3,8 @@
 ## 📝 Project Overview
 The **Maze Solver** is an interactive web application that allows users to create and solve mazes using the Breadth-First Search (BFS) algorithm. The app is built with React and features a dynamic interface where users can set the size of the maze, define start and end points, and visualize the algorithm's pathfinding process in real-time. This project is an excellent demonstration of algorithmic problem-solving and interactive web design, making it a valuable addition to any developer's portfolio.
 
+![image](https://github.com/user-attachments/assets/556adcc6-55e3-4bcd-9c17-8fc5f6edc9a2)
+
 ## 💡 Features
 - **Dynamic Maze Generation:**  
   Users can generate mazes of varying sizes by specifying the dimensions. The maze grid is dynamically created, allowing for a customizable experience.
